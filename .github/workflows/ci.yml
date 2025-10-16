@@ -15,9 +15,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - run: cd apps/server
-      - run: npm install
-      - run: npm run test:cov
+      - run: cd apps/server && npm install
+      - run: cd apps/server &&  npm run test:cov
       - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
