@@ -1,0 +1,62 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build
+/dist/
+/build/
+/.next/
+/.expo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+*.lcov
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+
+# Misc
+*.local
+*.cache
+
+# Test
+/test-results/
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Mobile
+apps/mobile/.expo/
+apps/mobile/.expo-shared/
+
+# Others
+*.tgz
+
+# Ignore generated files
+lib/
+
+# Monorepo
+apps/*/node_modules/
+libs/*/node_modules/

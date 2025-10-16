@@ -1,0 +1,93 @@
+Voici des idées concrètes et priorisées pour une application de listing et récupération de plans de montage LEGO.
+
+# Fonctionnalités
+
+## MVP (haute priorité)
+
+- [ ] Catalogue consultable. Fiches pièces : titre, set number, images, nombre de pièces, âge recommandé, langues disponibles.
+- [ ] Recherche full-text + filtres (année, thème, nombre de pièces, difficulté).
+- [ ] Visualiseur pas à pas. Zoom, navigation par étape, mode plein écran, thumbnails.
+- [ ] Téléchargement PDF / sauvegarde hors-ligne.
+- [ ] Gestion inventaire utilisateur. Marquer pièces possédées / manquantes. Génération de liste d’achat exportable.
+- [ ] Import simple d’instructions user-generated (upload PDF / images) avec métadonnées.
+
+## Fonctionnalités différenciantes (phase 2)
+
+- [ ] Reconnaissance OCR et extraction d’étapes depuis manuels scannés.
+- [ ] Mapping pièces ↔ fournisseurs (BrickLink, BrickOwl) pour prix & disponibilité.
+- [ ] Suggestions de substitutions de pièces (taille/couleur).
+- [ ] Mode AR : superposer l’étape sur la table via smartphone.
+- [ ] Visualisation 3D interactif (WebGL) avec rotation et isolement de pièces.
+- [ ] Multi-langues et traduction automatique des instructions.
+- [ ] Versions/alt builds et mashups community.
+
+## Engagement communautaire
+
+- [ ] Upload et notation des plans. Badges pour contributors.
+- [ ] Collections thématiques et challenges (build of the week).
+- [ ] Commentaires temporels liés à une étape (annotation collaborative).
+
+## Monétisation
+
+- [ ] Freemium : accès basique gratuit, abonnement pour téléchargement HD, AR, intégration fournisseurs.
+- [ ] Vente d’exports PDF premium.
+- [ ] Affiliation vers marketplaces pièces.
+
+# Aspects techniques (recommandés)
+
+- Backend : Node.js / NestJS ou Django. API REST/GraphQL.
+- Stockage médias : S3 compatible. CDN pour images/PDF.
+- Base : Mongodb pour recherche.
+- Viewer : React + WebGL (three.js) pour 3D, PDF.js pour PDF.
+- Mobile : React Native avec support offline.
+- OCR/ML : Tesseract + pipeline de nettoyage (optionnel).
+
+## Contraintes légales & conformité
+
+/!\ **Attention au copyright LEGO**.
+Préférer user-generated content ou liens vers sources officielles. Obtenir licences pour manuels officiels ou n’utiliser que extraits autorisés. Prévoir procédure DMCA et système de retrait.
+
+Respect RGPD pour comptes et données utilisateur.
+
+## Architecture données (essentiel)
+
+### Entités :
+
+- Set,
+- Instruction (multi-pages),
+- Piece (référence),
+- Inventory (user),
+- MarketplaceLink,
+- User,
+- Comment,
+- Upload.
+
+### Relations :
+
+Instruction ↔ Set ↔ Pieces (quantité, couleur, étape).
+
+## Priorité produit (roadmap 3 mois)
+
+### MVP :
+
+- [ ] Catalogue
+- [ ] recherche
+- [ ] viewer de base
+- [ ] upload PDF.
+
+### Phase 2 :
+
+- [ ] Inventory
+- [ ] liste d’achat
+- [ ] export
+
+### Phase 3
+
+- [ ] OCR
+- [ ] mapping pièces → fournisseurs.
+
+### Phase 4
+
+- [ ] 3D viewer
+- [ ] AR
+- [ ] monétisation.

@@ -1,0 +1,141 @@
+### Authentification
+
+# Inscription
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "motdepasse123",
+  "username": "testuser"
+}
+
+# Connexion
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "motdepasse123"
+}
+
+# Infos utilisateur courant
+GET http://localhost:3000/api/v1/auth/me
+Authorization: Bearer <JWT_TOKEN>
+
+### Sets
+
+# Liste paginée
+GET http://localhost:3000/api/v1/sets?search=star%20wars&theme=Star%20Wars&year=2020&pieces_min=100&pieces_max=1000
+
+# Détail d'un set
+GET http://localhost:3000/api/v1/sets/1
+
+# Ajout d'un set
+POST http://localhost:3000/api/v1/sets
+Content-Type: application/json
+
+{
+  "name": "LEGO Star Wars X-Wing",
+  "number": "75218",
+  "year": 2018,
+  "theme": "Star Wars",
+  "piece_count": 730,
+  "image_url": "https://lego.com/xwing.jpg"
+}
+
+### Instructions
+
+# Liste/recherche
+GET http://localhost:3000/api/v1/instructions?set_id=1&uploader_id=2
+
+# Détail
+GET http://localhost:3000/api/v1/instructions/1
+
+# Upload PDF
+POST http://localhost:3000/api/v1/instructions
+Content-Type: multipart/form-data
+
+{
+  "set_id": 1,
+  "title": "Instructions X-Wing",
+  "file": "<chemin/vers/instruction.pdf>",
+  "language": "fr"
+}
+
+# Suppression
+DELETE http://localhost:3000/api/v1/instructions/1
+Authorization: Bearer <JWT_TOKEN>
+
+### Pièces
+
+# Recherche
+GET http://localhost:3000/api/v1/pieces?name=brick&color=red&reference=3001
+
+# Détail
+GET http://localhost:3000/api/v1/pieces/1
+
+### Inventaire utilisateur
+
+# Liste
+GET http://localhost:3000/api/v1/inventory
+Authorization: Bearer <JWT_TOKEN>
+
+# Ajout
+POST http://localhost:3000/api/v1/inventory
+Content-Type: application/json
+Authorization: Bearer <JWT_TOKEN>
+
+{
+  "set_id": 1,
+  "piece_id": 3001,
+  "quantity": 2
+}
+
+# Modification quantité
+PATCH http://localhost:3000/api/v1/inventory/1
+Content-Type: application/json
+Authorization: Bearer <JWT_TOKEN>
+
+{
+  "quantity": 5
+}
+
+# Retrait
+DELETE http://localhost:3000/api/v1/inventory/1
+Authorization: Bearer <JWT_TOKEN>
+
+### Commentaires
+
+# Liste
+GET http://localhost:3000/api/v1/comments?target_type=set&target_id=1
+
+# Ajout
+POST http://localhost:3000/api/v1/comments
+Content-Type: application/json
+Authorization: Bearer <JWT_TOKEN>
+
+{
+  "target_type": "set",
+  "target_id": 1,
+  "content": "Super set !"
+}
+
+# Suppression
+DELETE http://localhost:3000/api/v1/comments/1
+Authorization: Bearer <JWT_TOKEN>
+
+### Marketplace
+
+# Prix par fournisseur
+GET http://localhost:3000/api/v1/marketplace/prices?piece_id=3001
+
+### OCR / Analyse
+
+# Upload PDF pour extraction
+POST http://localhost:3000/api/v1/analyze/pdf
+Content-Type: multipart/form-data
+
+{
+  "file": "<chemin/vers/instruction.pdf>"
+}

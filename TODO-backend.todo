@@ -1,0 +1,33 @@
+# Backend LEGO Vault
+
+☐ Tests unitaires et d’intégration
+    ☐ Ajouter des tests pour les services, contrôleurs, et endpoints (CRUD, filtres, pagination, etc.)
+    ☐ Vérifier la couverture de code et la robustesse des validations
+
+☐ Gestion des erreurs et messages personnalisés
+    ☐ Améliorer les messages d’erreur (class-validator, exceptions NestJS)
+    ☐ Ajouter des codes d’erreur et des réponses cohérentes pour l’API
+
+☐ Sécurité et authentification
+    ☐ Finaliser l’authentification JWT (vérifier la gestion des tokens, refresh, rôles)
+    ☐ Protéger les routes sensibles (middleware, guards)
+
+☐ Business logic avancée
+    ☐ Implémenter la logique métier spécifique (ex : gestion d’inventaire, marketplace, permissions)
+    ☐ Ajouter des hooks ou des événements si besoin (ex : notifications, logs)
+
+☐ Documentation de l’API
+   ☐ Générer la documentation Swagger complète et à jour
+   ☐ Documenter les modèles, DTOs, endpoints, et exemples de requêtes/réponses
+
+☐ Optimisations et monitoring
+   ☐ Optimiser les requêtes MongoDB (index, agrégations)
+   ☐ Mettre en place du monitoring (logs, métriques, alertes)
+
+☐ Préparation à la production
+   ☐ Vérifier la configuration Docker, variables d’environnement, sécurité
+   ☐ Tester la scalabilité et la résilience (restart, gestion des erreurs)
+
+☐ Connexion avec le frontend
+    ☐ Préparer des endpoints ou des services pour le mobile (auth, sets, instructions, etc.)
+    ☐ Tester l’intégration avec Expo/React Native

@@ -1,0 +1,38 @@
+{
+  "name": "brickvault",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~54.0.13",
+    "expo-status-bar": "~3.0.8",
+    "react": "19.1.0",
+    "react-native": "0.81.4"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.0",
+    "typescript": "~5.9.2"
+  },
+  "private": true,
+  "keywords": [
+    "lego",
+    "monorepo",
+    "nestjs",
+    "react-native",
+    "inventory",
+    "sets",
+    "pieces",
+    "collection",
+    "backend",
+    "mobile",
+    "typescript"
+  ],
+  "author": "CrokNoks",
+  "license": "Apache-2.0",
+  "description": "Monorepo BrickVault: manage LEGO collections, inventory, sets, and parts. Backend with NestJS, mobile app with React Native, shared libraries."
+}
