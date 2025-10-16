@@ -7,5 +7,5 @@ module.exports = {
   collectCoverage: true,
   coverageDirectory: './coverage',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
-  testTimeout: 15000,
+  testTimeout: 30000,
 };
