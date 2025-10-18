@@ -7,19 +7,24 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreateCommentDto } from '../../common/dto/comment.dto';
 import { Comment } from '../../common/entities/comment.type';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles, RolesGuard } from '../auth/roles.guard';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/v1/comments')
 export class CommentsController {
   constructor(
     @InjectModel('Comment') private readonly commentModel: Model<Comment>,
-  ) {}
+  ) { }
 
   @Get()
+  @Roles('user')
   async findAll(
     @Query('target_type') target_type?: string,
     @Query('target_id') target_id?: string,
@@ -59,21 +64,25 @@ export class CommentsController {
   }
 
   @Post()
+  @Roles('user')
   async create(@Body() dto: CreateCommentDto) {
     return this.commentModel.create(dto);
   }
 
   @Delete(':id')
+  @Roles('user')
   async delete(@Param('id') id: string) {
     return this.commentModel.findByIdAndDelete(id);
   }
 
   @Get(':id')
+  @Roles('user')
   async findOne(@Param('id') id: string): Promise<Comment | null> {
     return this.commentModel.findById(id);
   }
 
   @Put(':id')
+  @Roles('user')
   async update(
     @Param('id') id: string,
     @Body() dto: Partial<CreateCommentDto>,

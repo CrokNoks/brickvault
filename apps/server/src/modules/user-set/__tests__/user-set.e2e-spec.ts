@@ -1,4 +1,5 @@
 import type { INestApplication } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { disconnect } from 'mongoose';
@@ -13,7 +14,12 @@ describe('UserSet e2e', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        MongooseModule.forRoot(
+          process.env.MONGO_URL || 'mongodb://localhost/test-db-userset',
+        ),
+        AppModule,
+      ],
     }).compile();
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -36,19 +42,25 @@ describe('UserSet e2e', () => {
     token = loginRes.body.access_token;
 
     // Create a manufacturer
-    const manuRes = await request(server).post('/api/v1/manufacturers').send({
-      name: 'Test Manufacturer',
-      country: 'Testland',
-      website: 'https://test.com',
-    });
+    const manuRes = await request(server)
+      .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Test Manufacturer',
+        country: 'Testland',
+        website: 'https://test.com',
+      });
     const manufacturerId = manuRes.body._id;
     // Create a set (simulate, replace with real endpoint if exists)
-    const setRes = await request(server).post('/api/v1/sets').send({
-      name: 'Test Set',
-      number: '12345',
-      manufacturer: manufacturerId,
-      manufacturer_reference: 'REF12345',
-    });
+    const setRes = await request(server)
+      .post('/api/v1/sets')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Test Set',
+        number: '12345',
+        manufacturer: manufacturerId,
+        manufacturer_reference: 'REF12345',
+      });
     setId = setRes.body._id;
   });
 

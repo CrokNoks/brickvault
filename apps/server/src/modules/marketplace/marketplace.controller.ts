@@ -7,20 +7,25 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreateMarketplaceLinkDto } from '../../common/dto/marketplace-link.dto';
 import { MarketplaceLink } from '../../common/entities/marketplace-link.type';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles, RolesGuard } from '../auth/roles.guard';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/v1/marketplace')
 export class MarketplaceController {
   constructor(
     @InjectModel('MarketplaceLink')
     private readonly marketplaceModel: Model<MarketplaceLink>,
-  ) {}
+  ) { }
 
   @Get('prices')
+  @Roles('user')
   async getPrices(
     @Query('piece_id') piece_id?: string,
     @Query('supplier') supplier?: string,
@@ -58,6 +63,7 @@ export class MarketplaceController {
   }
 
   @Get()
+  @Roles('user')
   async getAll(
     @Query('piece_id') piece_id?: string,
     @Query('supplier') supplier?: string,
@@ -98,21 +104,25 @@ export class MarketplaceController {
   }
 
   @Post()
+  @Roles('user')
   async create(@Body() dto: CreateMarketplaceLinkDto) {
     return this.marketplaceModel.create(dto);
   }
 
   @Put(':id')
+  @Roles('user')
   async update(@Param('id') id: string, @Body() dto: CreateMarketplaceLinkDto) {
     return this.marketplaceModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
   @Delete(':id')
+  @Roles('user')
   async delete(@Param('id') id: string) {
     return this.marketplaceModel.findByIdAndDelete(id);
   }
 
   @Get(':id')
+  @Roles('user')
   async getOne(@Param('id') id: string): Promise<MarketplaceLink | null> {
     return this.marketplaceModel.findById(id);
   }
