@@ -18,7 +18,7 @@ import { Inventory } from '../../common/entities/inventory.type';
 export class InventoryController {
   constructor(
     @InjectModel('Inventory') private readonly inventoryModel: Model<Inventory>,
-  ) { }
+  ) {}
 
   @Get()
   async findAll(

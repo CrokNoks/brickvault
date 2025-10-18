@@ -17,7 +17,7 @@ import { Piece } from '../../common/entities/piece.type';
 export class PiecesController {
   constructor(
     @InjectModel('Piece') private readonly pieceModel: Model<Piece>,
-  ) { }
+  ) {}
 
   @Get()
   async findAll(

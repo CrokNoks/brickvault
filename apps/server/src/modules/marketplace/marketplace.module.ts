@@ -13,4 +13,4 @@ import { MarketplaceService } from './marketplace.service';
   controllers: [MarketplaceController],
   providers: [MarketplaceService],
 })
-export class MarketplaceModule { }
+export class MarketplaceModule {}

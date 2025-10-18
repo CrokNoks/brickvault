@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test:back:e2e": "cd apps/server && npm run test:e2e"
   },
   "keywords": [
     "lego",
@@ -23,12 +25,8 @@
   "description": "Monorepo BrickVault: manage LEGO collections, inventory, sets, and parts. Backend with NestJS, mobile app with React Native, shared libraries.",
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/mongoose": "^5.11.96",
-    "jest": "^30.2.0",
-    "supertest": "^7.1.4",
-    "ts-jest": "^29.4.5"
-  },
-  "dependencies": {
-    "mongoose": "^8.19.1"
+    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-prettier": "^5.5.4",
+    "typescript-eslint": "^8.46.1"
   }
 }

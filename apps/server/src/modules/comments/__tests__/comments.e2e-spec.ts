@@ -1,11 +1,11 @@
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
 import { Types } from 'mongoose';
 import * as request from 'supertest';
 import { CommentsModule } from '../comments.module';
 
-describe.only('Comments Endpoints (e2e)', () => {
+describe('Comments Endpoints (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -28,10 +28,10 @@ describe.only('Comments Endpoints (e2e)', () => {
   it('/api/v1/comments (GET) - liste vide', async () => {
     const res = await request(app.getHttpServer()).get('/api/v1/comments');
     expect(res.status).toBe(200);
-    const body = res.body as { items: any[] };
+    const body = res.body;
     expect(body.items).toBeDefined();
     expect(Array.isArray(body.items)).toBe(true);
-    expect(body.items.length).toBe(0);
+    expect(body.items).toHaveLength(0);
   });
 
   it('/api/v1/comments (POST) - création', async () => {
@@ -54,7 +54,7 @@ describe.only('Comments Endpoints (e2e)', () => {
       `/api/v1/comments?set=setId`,
     );
     expect(res.status).toBe(200);
-    const body = res.body as { items: any[] };
+    const body = res.body;
     expect(body.items).toBeDefined();
   });
 
@@ -63,7 +63,7 @@ describe.only('Comments Endpoints (e2e)', () => {
       '/api/v1/comments?page=1&limit=1',
     );
     expect(res.status).toBe(200);
-    const body = res.body as { items: any[]; page: number; limit: number };
+    const body = res.body;
     expect(body.items.length).toBeLessThanOrEqual(1);
     expect(body.page).toBe(1);
     expect(body.limit).toBe(1);
@@ -74,7 +74,7 @@ describe.only('Comments Endpoints (e2e)', () => {
       '/api/v1/comments?sort=created_at',
     );
     expect(res.status).toBe(200);
-    const body = res.body as { items: any[] };
+    const body = res.body;
     expect(body.items).toBeDefined();
   });
 

@@ -6,6 +6,6 @@ import { Model } from 'mongoose';
 export class CommentsService {
   constructor(
     @InjectModel('Comment') private readonly commentModel: Model<any>,
-  ) { }
+  ) {}
   // Ajoute ici la logique métier si besoin
 }

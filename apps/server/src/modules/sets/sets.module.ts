@@ -9,4 +9,4 @@ import { SetsController } from './sets.controller';
   controllers: [SetsController],
   providers: [],
 })
-export class SetsModule { }
+export class SetsModule {}

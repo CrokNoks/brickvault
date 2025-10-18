@@ -12,4 +12,4 @@ import { PiecesService } from './pieces.service';
   controllers: [PiecesController],
   providers: [PiecesService],
 })
-export class PiecesModule { }
+export class PiecesModule {}

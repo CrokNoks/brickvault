@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
 import { Types } from 'mongoose';
@@ -34,7 +34,7 @@ describe('Marketplace Endpoints (e2e)', () => {
     const body = res.body as { items: any[] };
     expect(body.items).toBeDefined();
     expect(Array.isArray(body.items)).toBe(true);
-    expect(body.items.length).toBe(0);
+    expect(body.items).toHaveLength(0);
   });
 
   it('/api/v1/marketplace (POST) - création', async () => {

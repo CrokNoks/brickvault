@@ -18,7 +18,7 @@ export class MarketplaceController {
   constructor(
     @InjectModel('MarketplaceLink')
     private readonly marketplaceModel: Model<MarketplaceLink>,
-  ) { }
+  ) {}
 
   @Get('prices')
   async getPrices(

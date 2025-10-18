@@ -16,7 +16,7 @@ import { ManufacturerService } from './manufacturer.service';
 
 @Controller('api/v1/manufacturers')
 export class ManufacturerController {
-  constructor(private readonly service: ManufacturerService) { }
+  constructor(private readonly service: ManufacturerService) {}
 
   @Get()
   async findAll(

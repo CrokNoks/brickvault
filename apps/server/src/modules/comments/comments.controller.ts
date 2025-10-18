@@ -17,7 +17,7 @@ import { Comment } from '../../common/entities/comment.type';
 export class CommentsController {
   constructor(
     @InjectModel('Comment') private readonly commentModel: Model<Comment>,
-  ) { }
+  ) {}
 
   @Get()
   async findAll(

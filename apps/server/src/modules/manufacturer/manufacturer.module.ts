@@ -13,4 +13,4 @@ import { ManufacturerService } from './manufacturer.service';
   controllers: [ManufacturerController],
   providers: [ManufacturerService],
 })
-export class ManufacturerModule { }
+export class ManufacturerModule {}

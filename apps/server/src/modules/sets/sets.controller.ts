@@ -16,7 +16,7 @@ import { Set } from '../../common/entities/set.type';
 
 @Controller('api/v1/sets')
 export class SetsController {
-  constructor(@InjectModel('Set') private readonly setModel: Model<Set>) { }
+  constructor(@InjectModel('Set') private readonly setModel: Model<Set>) {}
 
   @Get()
   async findAll(

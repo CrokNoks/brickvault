@@ -6,6 +6,6 @@ import { Model } from 'mongoose';
 export class InventoryService {
   constructor(
     @InjectModel('Inventory') private readonly inventoryModel: Model<any>,
-  ) { }
+  ) {}
   // Ajoute ici la logique métier si besoin
 }

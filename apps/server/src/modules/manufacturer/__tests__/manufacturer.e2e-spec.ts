@@ -1,7 +1,7 @@
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
-import { Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import * as request from 'supertest';
 import { SetsModule } from '../../sets/sets.module';
 import { ManufacturerModule } from '../manufacturer.module';

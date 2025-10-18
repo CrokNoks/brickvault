@@ -1,15 +1,18 @@
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
-import { Model, Types } from 'mongoose';
+import type { Model } from 'mongoose';
+import { Types } from 'mongoose';
 import * as request from 'supertest';
+import type { Manufacturer } from '../../../common/entities/manufacturer.type';
+import type { Set } from '../../../common/entities/set.type';
 import { ManufacturerModule } from '../../manufacturer/manufacturer.module';
 import { SetsModule } from '../sets.module';
 
 describe('Sets Endpoints (e2e)', () => {
   let app: INestApplication;
-  let setsModel: Model<any>;
-  let manufacturerModel: Model<any>;
+  let setsModel: Model<Set>;
+  let manufacturerModel: Model<Manufacturer>;
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -37,10 +40,10 @@ describe('Sets Endpoints (e2e)', () => {
   it('/api/v1/sets (GET) - liste vide', async () => {
     const res = await request(app.getHttpServer()).get('/api/v1/sets');
     expect(res.status).toBe(200);
-    const body = res.body as { items: any[] };
+    const body = res.body;
     expect(body.items).toBeDefined();
     expect(Array.isArray(body.items)).toBe(true);
-    expect(body.items.length).toBe(0);
+    expect(body.items).toHaveLength(0);
   });
 
   it('/api/v1/sets (POST) - création avec manufacturer', async () => {
@@ -150,7 +153,7 @@ describe('Sets Endpoints (e2e)', () => {
       '/api/v1/sets?page=1&limit=1',
     );
     expect(res.status).toBe(200);
-    const body = res.body as { items: any[]; page: number; limit: number };
+    const body = res.body;
     expect(body.items.length).toBeLessThanOrEqual(1);
     expect(body.page).toBe(1);
     expect(body.limit).toBe(1);
@@ -161,7 +164,7 @@ describe('Sets Endpoints (e2e)', () => {
       '/api/v1/sets?sort=year',
     );
     expect(res.status).toBe(200);
-    const body = res.body as { items: any[] };
+    const body = res.body;
     expect(body.items).toBeDefined();
     // Vérifie que le tri est correct si plusieurs sets
   });

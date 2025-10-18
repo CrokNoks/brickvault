@@ -18,7 +18,7 @@ export class InstructionsController {
   constructor(
     @InjectModel('Instruction')
     private readonly instructionModel: Model<Instruction>,
-  ) { }
+  ) {}
 
   @Get()
   async findAll(

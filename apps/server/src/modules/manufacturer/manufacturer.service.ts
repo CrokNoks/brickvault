@@ -8,7 +8,7 @@ export class ManufacturerService {
   constructor(
     @InjectModel('Manufacturer')
     private readonly manufacturerModel: Model<Manufacturer>,
-  ) { }
+  ) {}
 
   async create(data: Partial<Manufacturer>): Promise<Manufacturer> {
     // Check name uniqueness
@@ -58,7 +58,11 @@ export class ManufacturerService {
       const SetModel = this.manufacturerModel.db.model('Set');
       const sets = await SetModel.find({ manufacturer: manufacturer._id });
       // On retourne le manufacturer avec le champ sets peuplé
-      return { ...manufacturer.toObject(), sets };
+      const manufacturerObj = manufacturer.toObject();
+      return {
+        ...manufacturerObj,
+        sets,
+      };
     }
     return manufacturer;
   }

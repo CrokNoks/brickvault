@@ -14,4 +14,4 @@ import { InstructionsService } from './instructions.service';
   controllers: [InstructionsController],
   providers: [InstructionsService],
 })
-export class InstructionsModule { }
+export class InstructionsModule {}
