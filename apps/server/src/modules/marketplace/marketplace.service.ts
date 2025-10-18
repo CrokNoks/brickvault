@@ -7,6 +7,6 @@ export class MarketplaceService {
   constructor(
     @InjectModel('MarketplaceLink')
     private readonly marketplaceModel: Model<any>,
-  ) { }
+  ) {}
   // Ajoute ici la logique métier si besoin
 }

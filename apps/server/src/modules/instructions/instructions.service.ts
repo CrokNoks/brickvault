@@ -6,6 +6,6 @@ import { Model } from 'mongoose';
 export class InstructionsService {
   constructor(
     @InjectModel('Instruction') private readonly instructionModel: Model<any>,
-  ) { }
+  ) {}
   // Ajoute ici la logique métier si besoin
 }

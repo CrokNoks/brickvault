@@ -8,17 +8,22 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreateSetDto } from '../../common/dto/set.dto';
 import { Set } from '../../common/entities/set.type';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles, RolesGuard } from '../auth/roles.guard';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/v1/sets')
 export class SetsController {
   constructor(@InjectModel('Set') private readonly setModel: Model<Set>) { }
 
   @Get()
+  @Roles('user')
   async findAll(
     @Query('search') search?: string,
     @Query('theme') theme?: string,
@@ -70,11 +75,13 @@ export class SetsController {
   }
 
   @Get(':id')
+  @Roles('user')
   async findOne(@Param('id') id: string): Promise<Set | null> {
     return this.setModel.findById(id).populate('manufacturer');
   }
 
   @Post()
+  @Roles('user')
   async create(@Body() dto: CreateSetDto) {
     try {
       const created = await this.setModel.create(dto);
@@ -91,11 +98,13 @@ export class SetsController {
   }
 
   @Put(':id')
+  @Roles('user')
   async update(@Param('id') id: string, @Body() dto: CreateSetDto) {
     return this.setModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
   @Delete(':id')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.setModel.findByIdAndDelete(id);
   }

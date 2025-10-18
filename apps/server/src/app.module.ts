@@ -9,6 +9,7 @@ import { ManufacturerModule } from './modules/manufacturer/manufacturer.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { PiecesModule } from './modules/pieces/pieces.module';
 import { SetsModule } from './modules/sets/sets.module';
+import { UserSetModule } from './modules/user-set/user-set.module';
 
 @Module({
   imports: [
@@ -23,8 +24,9 @@ import { SetsModule } from './modules/sets/sets.module';
     CommentsModule,
     MarketplaceModule,
     ManufacturerModule,
+    UserSetModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

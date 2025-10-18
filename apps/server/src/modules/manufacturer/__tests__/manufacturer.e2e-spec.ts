@@ -1,30 +1,45 @@
-import { INestApplication } from '@nestjs/common';
-import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import type { INestApplication } from '@nestjs/common';
+import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
-import { Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import * as request from 'supertest';
-import { SetsModule } from '../../sets/sets.module';
-import { ManufacturerModule } from '../manufacturer.module';
+import { AppModule } from '../../../app.module';
 
 describe('Manufacturer Endpoints (e2e)', () => {
   let app: INestApplication;
 
   let manufacturerModel: Model<any>;
   let setModel: Model<any>;
+  let token: string;
+  let adminToken: string;
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
-      imports: [
-        MongooseModule.forRoot(
-          process.env.MONGO_URL || 'mongodb://localhost/test-db-manufacturer',
-        ),
-        ManufacturerModule,
-        SetsModule,
-      ],
+      imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
     await app.init();
     manufacturerModel = app.get(getModelToken('Manufacturer'));
     setModel = app.get(getModelToken('Set'));
+
+    await moduleFixture.get('UserModel').deleteMany({});
+
+    // Création utilisateur partagé
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/register')
+      .send({ email: 'test@e2e.com', password: 'Str0ng!Pass' });
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send({ email: 'test@e2e.com', password: 'Str0ng!Pass' });
+    token = loginRes.body.access_token;
+
+    // Création utilisateur admin
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/register')
+      .send({ email: 'admin@e2e.com', password: 'Str0ng!Pass', role: 'admin' });
+    const adminLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send({ email: 'admin@e2e.com', password: 'Str0ng!Pass' });
+    adminToken = adminLoginRes.body.access_token;
   });
 
   beforeEach(async () => {
@@ -33,7 +48,9 @@ describe('Manufacturer Endpoints (e2e)', () => {
   });
 
   it('/api/v1/manufacturers (GET) - liste vide', async () => {
-    const res = await request(app.getHttpServer()).get('/api/v1/manufacturers');
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     const body = res.body as { items?: any[] };
     expect(body).toBeDefined();
@@ -47,6 +64,7 @@ describe('Manufacturer Endpoints (e2e)', () => {
     };
     const res = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send(newManufacturer);
     expect(res.status).toBe(201);
     const body = res.body as { _id: string; name: string };
@@ -57,6 +75,7 @@ describe('Manufacturer Endpoints (e2e)', () => {
   it('/api/v1/manufacturers/:id (GET) - récupération', async () => {
     const createRes = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Mega Bloks',
         country: 'Canada',
@@ -64,9 +83,9 @@ describe('Manufacturer Endpoints (e2e)', () => {
       });
     const createBody = createRes.body as { _id: string };
     const id = createBody._id;
-    const res = await request(app.getHttpServer()).get(
-      `/api/v1/manufacturers/${id}`,
-    );
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/manufacturers/${id}`)
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     const body = res.body as { name: string };
     expect(body.name).toBe('Mega Bloks');
@@ -75,6 +94,7 @@ describe('Manufacturer Endpoints (e2e)', () => {
   it('/api/v1/manufacturers/:id (PUT) - mise à jour', async () => {
     const createRes = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Sluban',
         country: 'Chine',
@@ -83,6 +103,7 @@ describe('Manufacturer Endpoints (e2e)', () => {
     const id = createBody._id;
     const res = await request(app.getHttpServer())
       .put(`/api/v1/manufacturers/${id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Sluban Updated',
         country: 'Chine',
@@ -95,15 +116,16 @@ describe('Manufacturer Endpoints (e2e)', () => {
   it('/api/v1/manufacturers/:id (DELETE) - suppression', async () => {
     const createRes = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'BanBao',
         country: 'Chine',
       });
     const createBody = createRes.body as { _id: string };
     const id = createBody._id;
-    const res = await request(app.getHttpServer()).delete(
-      `/api/v1/manufacturers/${id}`,
-    );
+    const res = await request(app.getHttpServer())
+      .delete(`/api/v1/manufacturers/${id}`)
+      .set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     const body = res.body as { _id: string };
     expect(body._id).toBe(id);
@@ -116,15 +138,20 @@ describe('Manufacturer Endpoints (e2e)', () => {
   it('/api/v1/manufacturers (POST) - validation des champs requis', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ country: 'France' });
     expect(res.status).toBe(400);
   });
 
   it('/api/v1/manufacturers (POST) - unicité du nom', async () => {
     const data = { name: 'UniqueName', country: 'France' };
-    await request(app.getHttpServer()).post('/api/v1/manufacturers').send(data);
+    await request(app.getHttpServer())
+      .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
+      .send(data);
     const res = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send(data);
     expect(res.status).toBe(400);
     const body = res.body as { message: string };
@@ -135,13 +162,15 @@ describe('Manufacturer Endpoints (e2e)', () => {
   it('/api/v1/manufacturers (GET) - pagination', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'Pag1', country: 'FR' });
     await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'Pag2', country: 'FR' });
-    const res = await request(app.getHttpServer()).get(
-      '/api/v1/manufacturers?page=1&limit=1',
-    );
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/manufacturers?page=1&limit=1')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     const body = res.body as { items: any[]; page: number; limit: number };
     expect(body.items.length).toBeLessThanOrEqual(1);
@@ -150,9 +179,9 @@ describe('Manufacturer Endpoints (e2e)', () => {
   });
 
   it('/api/v1/manufacturers (GET) - tri par date', async () => {
-    const res = await request(app.getHttpServer()).get(
-      '/api/v1/manufacturers?sort=created_at',
-    );
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/manufacturers?sort=created_at')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     const body = res.body as { items: any[] };
     expect(body.items).toBeDefined();
@@ -161,13 +190,15 @@ describe('Manufacturer Endpoints (e2e)', () => {
   it('/api/v1/manufacturers (GET) - filtrage par pays', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'FiltreFR', country: 'France' });
     await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'FiltreDE', country: 'Allemagne' });
-    const res = await request(app.getHttpServer()).get(
-      '/api/v1/manufacturers?country=France',
-    );
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/manufacturers?country=France')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     const body = res.body as { items: { country: string }[] };
     expect(Array.isArray(body.items)).toBe(true);
@@ -177,11 +208,13 @@ describe('Manufacturer Endpoints (e2e)', () => {
   it('/api/v1/manufacturers/:id (PATCH) - mise à jour partielle', async () => {
     const createRes = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'PatchTest', country: 'FR' });
     const createBody = createRes.body as { _id: string };
     const id = createBody._id;
     const res = await request(app.getHttpServer())
       .patch(`/api/v1/manufacturers/${id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({ website: 'https://patch.fr' });
     expect(res.status).toBe(200);
     const body = res.body as { website: string };
@@ -190,9 +223,9 @@ describe('Manufacturer Endpoints (e2e)', () => {
   });
 
   it('/api/v1/manufacturers/:id (GET) - 404 si inexistant', async () => {
-    const res = await request(app.getHttpServer()).get(
-      '/api/v1/manufacturers/507f1f77bcf86cd799439011',
-    );
+    const res = await request(app.getHttpServer())
+      .get('/api/v1/manufacturers/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${token}`);
     expect([404, 400]).toContain(res.status);
   });
 
@@ -201,12 +234,14 @@ describe('Manufacturer Endpoints (e2e)', () => {
     // Crée un manufacturer
     const manRes = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'CascadeManu', country: 'FR' });
     const createBody = manRes.body as { _id: string };
     const manufacturerId = createBody._id;
     // Crée un set lié à ce manufacturer
     const setRes = await request(app.getHttpServer())
       .post('/api/v1/sets')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'CascadeSet',
         theme: 'Test',
@@ -220,34 +255,38 @@ describe('Manufacturer Endpoints (e2e)', () => {
     expect(setBody._id).toBeDefined();
     const setId = setBody._id;
     // Supprime le manufacturer
-    const delRes = await request(app.getHttpServer()).delete(
-      `/api/v1/manufacturers/${manufacturerId}`,
-    );
+    const delRes = await request(app.getHttpServer())
+      .delete(`/api/v1/manufacturers/${manufacturerId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
     expect(delRes.status).toBe(200);
     // Vérifie que le set est supprimé ou orphelin
-    const getSet = await request(app.getHttpServer()).get(
-      `/api/v1/sets/${setId}`,
-    );
+    const getSet = await request(app.getHttpServer())
+      .get(`/api/v1/sets/${setId}`)
+      .set('Authorization', `Bearer ${token}`);
     expect([404, 200]).toContain(getSet.status); // selon la logique métier
   });
 
   it('/api/v1/manufacturers/:id (GET) - population des sets liés', async () => {
     const manRes = await request(app.getHttpServer())
       .post('/api/v1/manufacturers')
+      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'PopuManu', country: 'FR' });
     const manBody = manRes.body as { _id: string };
     const manufacturerId = manBody._id;
-    await request(app.getHttpServer()).post('/api/v1/sets').send({
-      name: 'PopuSet',
-      theme: 'Test',
-      year: 2022,
-      piece_count: 100,
-      manufacturer: manufacturerId,
-      manufacturer_reference: 'POP-1234',
-    });
-    const res = await request(app.getHttpServer()).get(
-      `/api/v1/manufacturers/${manufacturerId}?populate=sets`,
-    );
+    await request(app.getHttpServer())
+      .post('/api/v1/sets')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'PopuSet',
+        theme: 'Test',
+        year: 2022,
+        piece_count: 100,
+        manufacturer: manufacturerId,
+        manufacturer_reference: 'POP-1234',
+      });
+    const res = await request(app.getHttpServer())
+      .get(`/api/v1/manufacturers/${manufacturerId}?populate=sets`)
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     const body = res.body as { sets: any[] };
     expect(body).toBeDefined();

@@ -7,12 +7,16 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreateInstructionDto } from '../../common/dto/instruction.dto';
 import { Instruction } from '../../common/entities/instruction.type';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles, RolesGuard } from '../auth/roles.guard';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/v1/instructions')
 export class InstructionsController {
   constructor(
@@ -21,6 +25,7 @@ export class InstructionsController {
   ) { }
 
   @Get()
+  @Roles('user')
   async findAll(
     @Query('set_id') set_id?: string,
     @Query('uploader_id') uploader_id?: string,
@@ -60,21 +65,25 @@ export class InstructionsController {
   }
 
   @Get(':id')
+  @Roles('user')
   async findOne(@Param('id') id: string): Promise<Instruction | null> {
     return this.instructionModel.findById(id);
   }
 
   @Post()
+  @Roles('user')
   async create(@Body() dto: CreateInstructionDto) {
     return this.instructionModel.create(dto);
   }
 
   @Put(':id')
+  @Roles('user')
   async update(@Param('id') id: string, @Body() dto: CreateInstructionDto) {
     return this.instructionModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
   @Delete(':id')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.instructionModel.findByIdAndDelete(id);
   }

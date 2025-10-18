@@ -7,12 +7,16 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreatePieceDto } from '../../common/dto/piece.dto';
 import { Piece } from '../../common/entities/piece.type';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles, RolesGuard } from '../auth/roles.guard';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/v1/pieces')
 export class PiecesController {
   constructor(
@@ -20,6 +24,7 @@ export class PiecesController {
   ) { }
 
   @Get()
+  @Roles('user')
   async findAll(
     @Query('name') name?: string,
     @Query('color') color?: string,
@@ -62,21 +67,25 @@ export class PiecesController {
   }
 
   @Get(':id')
+  @Roles('user')
   async findOne(@Param('id') id: string): Promise<Piece | null> {
     return this.pieceModel.findById(id);
   }
 
   @Post()
+  @Roles('user')
   async create(@Body() dto: CreatePieceDto) {
     return this.pieceModel.create(dto);
   }
 
   @Put(':id')
+  @Roles('user')
   async update(@Param('id') id: string, @Body() dto: CreatePieceDto) {
     return this.pieceModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
   @Delete(':id')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.pieceModel.findByIdAndDelete(id);
   }
