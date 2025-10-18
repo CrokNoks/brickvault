@@ -8,6 +8,7 @@ import { AppModule } from '../../../app.module';
 describe('Comments Endpoints (e2e)', () => {
   let app: INestApplication;
   let token: string;
+  let adminToken: string;
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -31,6 +32,15 @@ describe('Comments Endpoints (e2e)', () => {
       .post('/api/v1/auth/login')
       .send({ email: 'test@e2e.com', password: 'Str0ng!Pass' });
     token = loginRes.body.access_token;
+
+    // Création utilisateur admin
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/register')
+      .send({ email: 'admin@e2e.com', password: 'Str0ng!Pass', role: 'admin' });
+    const adminLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send({ email: 'admin@e2e.com', password: 'Str0ng!Pass' });
+    adminToken = adminLoginRes.body.access_token;
   });
 
   beforeEach(async () => {
@@ -153,7 +163,7 @@ describe('Comments Endpoints (e2e)', () => {
     const id = createBody._id;
     const res = await request(app.getHttpServer())
       .delete(`/api/v1/comments/${id}`)
-      .set('Authorization', `Bearer ${token}`);
+      .set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     const body = res.body as { _id: string };
     expect(body._id).toBe(id);

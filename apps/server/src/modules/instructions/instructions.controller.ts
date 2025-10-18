@@ -83,7 +83,7 @@ export class InstructionsController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.instructionModel.findByIdAndDelete(id);
   }

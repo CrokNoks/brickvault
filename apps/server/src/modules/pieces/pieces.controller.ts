@@ -85,7 +85,7 @@ export class PiecesController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.pieceModel.findByIdAndDelete(id);
   }

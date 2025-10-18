@@ -19,7 +19,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(
     email: string,
@@ -31,11 +31,19 @@ export class AuthService {
         'Password must be at least 8 characters long, contain upper and lower case letters, a number, and a special character.',
       );
     }
+    let finalRole: 'user' | 'admin' = 'user';
+    if (role === 'admin') {
+      if (process.env.NODE_ENV === 'development') {
+        finalRole = 'admin';
+      } // sinon reste 'user'
+    } else {
+      finalRole = role;
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.usersService.create({
       email,
       password: hashedPassword,
-      role,
+      role: finalRole,
     });
     return { user };
   }

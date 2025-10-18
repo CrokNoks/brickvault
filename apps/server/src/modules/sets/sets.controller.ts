@@ -104,7 +104,7 @@ export class SetsController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.setModel.findByIdAndDelete(id);
   }

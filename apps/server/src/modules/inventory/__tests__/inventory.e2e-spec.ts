@@ -10,6 +10,7 @@ describe('Inventory Endpoints (e2e)', () => {
   let userId: string;
   let pieceId: string;
   let token: string;
+  let adminToken: string;
   beforeAll(async () => {
     userId = new Types.ObjectId().toHexString();
     pieceId = new Types.ObjectId().toHexString();
@@ -34,6 +35,17 @@ describe('Inventory Endpoints (e2e)', () => {
       .post('/api/v1/auth/login')
       .send({ email: 'test@inventory.com', password: 'Str0ng!Pass' });
     token = loginRes.body.access_token;
+
+    // Création utilisateur admin
+    await request(app.getHttpServer()).post('/api/v1/auth/register').send({
+      email: 'admin@inventory.com',
+      password: 'Str0ng!Pass',
+      role: 'admin',
+    });
+    const adminLoginRes = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send({ email: 'admin@inventory.com', password: 'Str0ng!Pass' });
+    adminToken = adminLoginRes.body.access_token;
   });
 
   beforeEach(async () => {
@@ -136,7 +148,7 @@ describe('Inventory Endpoints (e2e)', () => {
     const id = createBody._id;
     const res = await request(app.getHttpServer())
       .delete(`/api/v1/inventory/${id}`)
-      .set('Authorization', `Bearer ${token}`);
+      .set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     const body = res.body as { _id: string };
     expect(body._id).toBe(id);

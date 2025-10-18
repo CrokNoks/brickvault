@@ -70,7 +70,7 @@ export class CommentsController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.commentModel.findByIdAndDelete(id);
   }

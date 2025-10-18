@@ -116,7 +116,7 @@ export class MarketplaceController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.marketplaceModel.findByIdAndDelete(id);
   }

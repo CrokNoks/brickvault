@@ -88,7 +88,7 @@ export class InventoryController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     return this.inventoryModel.findByIdAndDelete(id);
   }

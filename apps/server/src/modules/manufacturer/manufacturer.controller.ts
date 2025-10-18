@@ -63,7 +63,7 @@ export class ManufacturerController {
   }
 
   @Delete(':id')
-  @Roles('user')
+  @Roles('admin')
   @HttpCode(200)
   async delete(@Param('id') id: string) {
     const deleted = await this.service.delete(id);
