@@ -1,0 +1,31 @@
+# @import ./auth.http
+# @ref user_token
+{{+
+  const token = user_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+}}
+
+### Assignation d'un set à l'utilisateur
+# @name assignSet
+# @import ./sets.http
+# @ref createSet
+POST {{host}}/api/v1/user-sets
+...defaultHeaders
+Content-Type: application/json
+{
+  "setRef": "{{createSet._id}}"
+}
+?? status == 201
+
+### Récupération des sets de l'utilisateur
+GET {{host}}/api/v1/user-sets
+...defaultHeaders
+?? status == 200
+
+### Suppression d'un set de l'utilisateur
+# @ref assignSet
+DELETE {{host}}/api/v1/user-sets/{{assignSet.setRef}}
+...defaultHeaders
+?? status == 200

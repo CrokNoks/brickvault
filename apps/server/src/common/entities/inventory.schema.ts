@@ -1,14 +1,13 @@
 import { Schema, Types } from 'mongoose';
 
-export const InventorySchema = new Schema({
-  user_id: { type: Types.ObjectId, ref: 'User', required: true },
-  set_id: { type: Types.ObjectId, ref: 'Set' },
-  quantity: { type: Number, default: 1 },
-  pieces: [
-    {
-      piece_id: { type: Types.ObjectId, ref: 'Piece', required: true },
-      quantity: { type: Number, default: 1 },
-    },
-  ],
+const InventoryPieceSchema = new Schema({
+  piece_id: { type: Types.ObjectId, ref: 'Piece', required: true },
+  quantity: { type: Number, default: 1, required: true },
 });
+
+export const InventorySchema = new Schema({
+  set_id: { type: Types.ObjectId, ref: 'Set' },
+  pieces: [InventoryPieceSchema],
+});
+
 InventorySchema.index({ set_id: 1 }, { unique: true });

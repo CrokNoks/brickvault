@@ -1,0 +1,54 @@
+# @import ./auth.http
+# @ref user_token
+# @ref admin_token
+{{+
+  const token = user_token.access_token;
+  const adminToken = admin_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+  exports.adminHeaders = {
+    'Authorization': `Bearer ${adminToken}`
+  };
+}}
+
+### Liste vide des fabricants
+GET {{host}}/api/v1/manufacturers
+...defaultHeaders
+?? status == 200
+?? body page == 1
+?? body limit == 10
+?? body items.length == 0
+
+### Création d'un fabricant
+# @name createManufacturer
+POST {{host}}/api/v1/manufacturers
+...defaultHeaders
+Content-Type: application/json
+{
+  "name": "Cobi-{{+Math.random().toString(36).substring(2, 8)}}",
+  "country": "Pologne",
+  "website": "https://cobi.pl"
+}
+?? status == 201
+
+### Récupération d'un fabricant
+GET {{host}}/api/v1/manufacturers/{{createManufacturer._id}}
+...defaultHeaders
+?? status == 200
+
+### Mise à jour d'un fabricant
+PUT {{host}}/api/v1/manufacturers/{{createManufacturer._id}}
+...defaultHeaders
+Content-Type: application/json
+{
+  "name": "Cobi Updated",
+  "country": "Pologne",
+  "website": "https://cobi-updated.pl"
+}
+?? status == 200
+
+### Suppression d'un fabricant (admin)
+DELETE {{host}}/api/v1/manufacturers/{{createManufacturer._id}}
+...adminHeaders
+?? status == 200

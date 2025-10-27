@@ -1,0 +1,22 @@
+{
+  "envDefault": "local",
+  "environments": {
+    "local": {
+      "host": "http://localhost:3000",
+      "user_email": "testuser@example.com",
+      "user_password": "Password123!",
+      "admin_email": "adminuser@example.com",
+      "admin_password": "AdminPass123!"
+    },
+    "dev": {
+      "host": "https://dev.api.brickvault.fr"
+    },
+    "prod": {
+      "host": "https://api.brickvault.fr"
+    }
+  },
+  "meta": {
+    "project": "BrickVault",
+    "description": "Config httpyac pour les tests API BrickVault"
+  }
+}

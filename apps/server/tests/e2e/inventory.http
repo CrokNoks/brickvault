@@ -1,0 +1,64 @@
+# @import ./auth.http
+# @ref user_token
+# @ref admin_token
+{{+
+  const token = user_token.access_token;
+  const adminToken = admin_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+  exports.adminHeaders = {
+    'Authorization': `Bearer ${adminToken}`
+  };
+}}
+
+### Liste vide de l'inventaire
+GET {{host}}/api/v1/inventory
+...defaultHeaders
+?? status == 200
+
+### Création d'un inventaire
+# @name createInventory
+# @import ./pieces.http
+# @import ./auth.http
+# @ref user_info
+# @ref getPiece
+POST {{host}}/api/v1/inventory
+...defaultHeaders
+Content-Type: application/json
+{
+  "user_id": "{{user_info._id}}",
+  "pieces": [{"piece_id": "{{getPiece._id}}", "quantity": 5}]
+}
+?? status == 201
+
+### Récupération d'un inventaire
+# @name getInventory
+# @ref createInventory
+GET {{host}}/api/v1/inventory/{{createInventory._id}}
+...defaultHeaders
+?? status == 200
+
+### Filtre par user
+# @import ./auth.http
+# @ref user_info
+GET {{host}}/api/v1/inventory?user_id={{user_info._id}}
+...defaultHeaders
+?? status == 200
+
+### Pagination
+GET {{host}}/api/v1/inventory?page=1&limit=1
+...defaultHeaders
+?? status == 200
+
+### Tri par date
+GET {{host}}/api/v1/inventory?sort=created_at
+...defaultHeaders
+?? status == 200
+
+### Suppression d'un inventaire (admin)
+# @ref getInventory
+DELETE {{host}}/api/v1/inventory/{{getInventory._id}}
+...adminHeaders
+
+?? status == 200

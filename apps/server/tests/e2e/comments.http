@@ -1,0 +1,71 @@
+# @import ./auth.http
+# @ref user_token
+{{+
+  const token = user_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+}}
+
+### Liste vide des commentaires
+GET {{host}}/api/v1/comments
+...defaultHeaders
+
+?? status == 200
+?? body page==1
+
+### Création d'un commentaire
+# @import ./sets.http
+# @ref createSet
+# @name createComment
+# @ref user_info
+POST {{host}}/api/v1/comments
+...defaultHeaders
+Content-Type: application/json
+{
+  "user_id": "{{user_info._id}}",
+  "target_type": "set",
+  "target_id": "{{createSet._id}}",
+  "content": "Super set!"
+}
+?? status == 201
+
+### Liste filtrée par set
+# @import ./sets.http
+# @ref createSet
+GET {{host}}/api/v1/comments?set={{createSet._id}}
+...defaultHeaders
+
+### Pagination des commentaires
+GET {{host}}/api/v1/comments?page=1&limit=1
+...defaultHeaders
+
+### Tri par date
+GET {{host}}/api/v1/comments?sort=created_at
+...defaultHeaders
+
+### Récupération d'un commentaire
+# @name getComment
+GET {{host}}/api/v1/comments/{{createComment._id}}
+...defaultHeaders
+
+### Mise à jour d'un commentaire
+# @import ./sets.http
+# @name updateComment
+# @ref user_info
+# @ref createSet
+PUT {{host}}/api/v1/comments/{{createComment._id}}
+Content-Type: application/json
+...defaultHeaders
+
+{
+  "user_id": "{{user_info._id}}",
+  "target_type": "set",
+  "target_id": "{{createSet._id}}",
+  "content": "Updated comment"
+}
+
+### Suppression d'un commentaire (admin)
+# @ref createComment
+DELETE {{host}}/api/v1/comments/{{createComment._id}}
+...defaultHeaders

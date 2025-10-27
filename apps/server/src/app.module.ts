@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuthModule } from './modules/auth/auth.module';
@@ -13,9 +14,18 @@ import { UserSetModule } from './modules/user-set/user-set.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      process.env.MONGO_URI || 'mongodb://localhost:27017/brickvault',
-    ),
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          uri:
+            config.get<string>('MONGO_URI') ||
+            'mongodb://localhost:27017/brickvault',
+        };
+      },
+    }),
     AuthModule,
     SetsModule,
     InstructionsModule,
@@ -29,4 +39,4 @@ import { UserSetModule } from './modules/user-set/user-set.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

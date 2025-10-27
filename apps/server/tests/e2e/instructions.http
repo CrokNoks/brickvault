@@ -1,0 +1,53 @@
+# @import ./auth.http
+# @ref user_token
+# @ref admin_token
+{{+
+  const token = user_token.access_token;
+  const adminToken = admin_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+  exports.adminHeaders = {
+    'Authorization': `Bearer ${adminToken}`
+  };
+}}
+
+### Liste vide des instructions
+GET {{host}}/api/v1/instructions
+...defaultHeaders
+?? status == 200
+
+### Création d'une instruction
+# @import ./sets.http
+# @name createInstruction
+# @ref getSet
+POST {{host}}/api/v1/instructions
+...defaultHeaders
+Content-Type: application/json
+{
+  "set_id": "{{getSet._id}}",
+  "steps": []
+}
+?? status == 201
+
+### Filtre par set
+# @ref createInstruction
+GET {{host}}/api/v1/instructions?set_id={{createInstruction.set_id}}
+...defaultHeaders
+?? status == 200
+
+### Pagination
+GET {{host}}/api/v1/instructions?page=1&limit=1
+...defaultHeaders
+?? status == 200
+
+### Tri par date
+GET {{host}}/api/v1/instructions?sort=created_at
+...defaultHeaders
+?? status == 200
+
+### Suppression d'une instruction (admin)
+# @ref createInstruction
+DELETE {{host}}/api/v1/instructions/{{createInstruction._id}}
+...adminHeaders
+?? status == 200

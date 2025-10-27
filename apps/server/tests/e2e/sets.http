@@ -1,0 +1,113 @@
+# @import ./auth.http
+# @ref user_token
+# @ref admin_token
+{{+
+  const token = user_token.access_token;
+  const adminToken = admin_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+  exports.adminHeaders = {
+    'Authorization': `Bearer ${adminToken}`
+  };
+}}
+
+### Liste vide des sets
+GET {{host}}/api/v1/sets
+...defaultHeaders
+?? status == 200
+
+### Création d'un set lié à ce fabricant
+# @import ./manufacturer.http
+# @name createSet
+# @ref createManufacturer
+POST {{host}}/api/v1/sets
+...defaultHeaders
+Content-Type: application/json
+{
+  "name": "Cobi Tank",
+  "manufacturer_reference": "COBI-1234",
+  "theme": "Military",
+  "year": 2022,
+  "piece_count": 800,
+  "manufacturer": "{{createManufacturer._id}}"
+}
+?? status == 201
+
+### Unicité manufacturer/manufacturer_reference
+# @import ./manufacturer.http
+# @ref createManufacturer
+# @name createSetDuplicate
+POST {{host}}/api/v1/sets
+...defaultHeaders
+Content-Type: application/json
+{
+  "name": "Mega Jet",
+  "manufacturer_reference": "MEGA-999",
+  "theme": "Aviation",
+  "year": 2023,
+  "piece_count": 500,
+  "manufacturer": "{{createManufacturer._id}}"
+}
+?? status == 201
+
+# @ref createSetDuplicate
+POST {{host}}/api/v1/sets
+...defaultHeaders
+Content-Type: application/json
+{
+  "name": "Mega Jet",
+  "manufacturer_reference": "MEGA-999",
+  "theme": "Aviation",
+  "year": 2023,
+  "piece_count": 500,
+  "manufacturer": "{{createManufacturer._id}}"
+}
+?? status == 400
+?? body error = "Bad Request"
+
+### Filtre par thème
+GET {{host}}/api/v1/sets?theme=Star Wars
+...defaultHeaders
+?? status == 200
+
+### Pagination
+GET {{host}}/api/v1/sets?page=1&limit=1
+...defaultHeaders
+?? status == 200
+
+### Tri par année
+GET {{host}}/api/v1/sets?sort=year
+...defaultHeaders
+?? status == 200
+
+### Récupération d'un set
+# @ref createSet
+# @name getSet
+GET {{host}}/api/v1/sets/{{createSet._id}}
+...defaultHeaders
+?? status == 200
+
+### Mise à jour d'un set
+# @import ./manufacturer.http
+# @ref createManufacturer
+# @ref createSet
+PUT {{host}}/api/v1/sets/{{createSet._id}}
+...defaultHeaders
+Content-Type: application/json
+{
+  "name": "Cobi Tank Updated",
+  "manufacturer_reference": "COBI-1234",
+  "theme": "Military",
+  "year": 2023,
+  "piece_count": 800,
+  "manufacturer": "{{createManufacturer._id}}"
+}
+?? status == 200
+?? body year == 2023
+
+### Suppression d'un set (admin)
+# @ref createSet
+DELETE {{host}}/api/v1/sets/{{createSet._id}}
+...adminHeaders
+?? status == 200

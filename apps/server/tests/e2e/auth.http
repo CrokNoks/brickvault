@@ -1,0 +1,93 @@
+### Inscription utilisateur (succès)
+# @name user_create
+POST {{host}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{user_email}}",
+  "password": "{{user_password}}"
+}
+
+### Inscription admin (succès)
+# @name admin_create
+POST {{host}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{admin_email}}",
+  "password": "{{admin_password}}",
+  "role": "admin"
+}
+
+### Inscription avec mot de passe faible (échec)
+POST {{host}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "weak@example.com",
+  "password": "weakpass"
+}
+
+?? status == 400
+?? body error.message =~ /Password must be at least 8 char/
+
+### Inscription avec email dupliqué (échec)
+# On crée d'abord l'utilisateur
+# @name dupe_email
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "dupe_2@example.com",
+  "password": "Str0ng!Pass"
+}
+?? status == 201
+
+### Tentative de doublon
+# @ref dupe_email
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{dupe_email.user.email}}",
+  "password": "Str0ng!Pass"
+}
+?? status == 400
+?? body error.message =~ /Email already/
+
+### Connexion et récupération du User JWT
+# @name user_token
+# @ref user_create
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{user_email}}",
+  "password": "{{user_password}}"
+}
+
+### Connexion et récupération du Admin JWT
+# @name admin_token
+# @ref admin_create
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin_email}}",
+  "password": "{{admin_password}}"
+}
+
+### Get current user info
+# @ref user_token
+# @name user_info
+GET http://localhost:3000/api/v1/auth/me
+Authorization: Bearer {{user_token.access_token}}
+?? status == 200
+
+
+### Get current admin info
+# @ref admin_token
+# @name admin_
+GET http://localhost:3000/api/v1/auth/me
+Authorization: Bearer {{admin_token.access_token}}
+?? status == 200

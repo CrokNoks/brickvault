@@ -1,7 +1,6 @@
 import { Schema } from 'mongoose';
 
 export const SetSchema = new Schema({
-  manufacturer_reference: { type: String, unique: true, required: true },
   name: { type: String, required: true },
   year: Number,
   theme: String,

@@ -6,4 +6,5 @@ export type Instruction = {
   language?: string;
   uploader_id?: string;
   created_at?: Date;
+  steps?: any[];
 };

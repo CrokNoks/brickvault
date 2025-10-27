@@ -7,5 +7,4 @@ export const InstructionSchema = new Schema({
   language: String,
   uploader_id: { type: Types.ObjectId, ref: 'User' },
   created_at: { type: Date, default: Date.now },
-  steps: { type: Array, default: [] },
 });

@@ -1,0 +1,52 @@
+# @import ./auth.http
+# @ref user_token
+# @ref admin_token
+{{+
+  const token = user_token.access_token;
+  const adminToken = admin_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+  exports.adminHeaders = {
+    'Authorization': `Bearer ${adminToken}`
+  };
+}}
+
+### Liste vide des pièces
+GET {{host}}/api/v1/pieces
+...defaultHeaders
+?? status == 200
+
+### Création d'une pièce
+# @name createPiece
+POST {{host}}/api/v1/pieces
+...defaultHeaders
+Content-Type: application/json
+{
+  "ref": "3001",
+  "name": "Brick 2x4",
+  "color": "Red"
+}
+?? status == 201
+
+### Récupération d'une pièce
+# @name getPiece
+# @ref createPiece
+GET {{host}}/api/v1/pieces/{{createPiece._id}}
+...defaultHeaders
+
+### Filtre par couleur
+GET {{host}}/api/v1/pieces?color=Red
+...defaultHeaders
+?? status == 200
+
+### Pagination
+GET {{host}}/api/v1/pieces?page=1&limit=1
+...defaultHeaders
+?? status == 200
+
+### Suppression d'une pièce (admin)
+# @ref createPiece
+DELETE {{host}}/api/v1/pieces/{{createPiece._id}}
+...adminHeaders
+?? status == 200

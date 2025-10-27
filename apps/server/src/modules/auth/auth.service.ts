@@ -3,6 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users';
@@ -19,6 +20,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) { }
 
   async register(
@@ -32,12 +34,10 @@ export class AuthService {
       );
     }
     let finalRole: 'user' | 'admin' = 'user';
-    if (role === 'admin') {
-      if (process.env.NODE_ENV === 'development') {
-        finalRole = 'admin';
-      } // sinon reste 'user'
-    } else {
+    if (this.configService.get<string>('NODE_ENV') === 'development') {
       finalRole = role;
+    } else {
+      finalRole = 'user';
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.usersService.create({

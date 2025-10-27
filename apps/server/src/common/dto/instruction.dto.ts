@@ -1,8 +1,11 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class CreateInstructionDto {
   @IsString()
   set_id: string;
+
+  @IsArray()
+  steps: any[];
 
   @IsOptional()
   @IsString()

@@ -1,0 +1,57 @@
+# @import ./auth.http
+# @ref user_token
+# @ref admin_token
+{{+
+  const token = user_token.access_token;
+  const adminToken = admin_token.access_token;
+  exports.defaultHeaders = {
+    'Authorization': `Bearer ${token}`
+  };
+  exports.adminHeaders = {
+    'Authorization': `Bearer ${adminToken}`
+  };
+}}
+
+### Liste vide marketplace
+GET {{host}}/api/v1/marketplace
+...defaultHeaders
+?? status == 200
+
+### Création d'un lien marketplace
+# @name createMarketplace
+# @import ./pieces.http
+# @ref getPiece
+POST {{host}}/api/v1/marketplace
+...defaultHeaders
+Content-Type: application/json
+{
+  "piece_id": "{{getPiece._id}}",
+  "url": "https://lego.com",
+  "price": 99.99
+}
+?? status == 201
+
+### Récupération d'un lien marketplace
+# @name getMarketplace
+# @ref createMarketplace
+GET {{host}}/api/v1/marketplace/{{createMarketplace._id}}
+...defaultHeaders
+?? status == 200
+
+### Filtre par piece_id
+# @import ./pieces.http
+# @ref getPiece
+GET {{host}}/api/v1/marketplace?piece_id={{getPiece._id}}
+...defaultHeaders
+?? status == 200
+
+### Pagination
+GET {{host}}/api/v1/marketplace?page=1&limit=1
+...defaultHeaders
+?? status == 200
+
+### Suppression d'un lien marketplace (admin)
+# @ref getMarketplace
+DELETE {{host}}/api/v1/marketplace/{{getMarketplace._id}}
+...adminHeaders
+?? status == 200
